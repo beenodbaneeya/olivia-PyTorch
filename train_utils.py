@@ -22,7 +22,6 @@ def train(model, optimizer, train_loader, loss_fn, device):
         optimizer.step()
 
 
-
 def test(model, test_loader, loss_fn, device):
     """
     Evaluates the model on the validation dataset.Note that, this function will be used in the multi-gpu implementation aswell.

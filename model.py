@@ -8,6 +8,7 @@ class cbrblock(nn.Module):
     def forward(self, x):
         return self.cbr(x)
 
+
 # Basic residual block
 class conv_block(nn.Module):
     def __init__(self, input_channels, output_channels, scale_input):
@@ -18,6 +19,7 @@ class conv_block(nn.Module):
         self.layer1 = cbrblock(input_channels, output_channels)
         self.dropout = nn.Dropout(p=0.01)
         self.layer2 = cbrblock(output_channels, output_channels)
+
     def forward(self,x):
         residual = x
         out = self.layer1(x)

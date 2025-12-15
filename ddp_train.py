@@ -11,7 +11,10 @@ from dataset_utils import load_cifar100
 from model import WideResNet
 from train_utils import test
 
-#Parse input arguments
+# Configuration
+DATA_DIR = "./datasets"  # Dataset downloads automatically here
+
+# Parse input arguments
 parser = argparse.ArgumentParser(description='CIFAR-100 DDP example with Mixed Precision',
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('--batch-size', type=int, default=512, help='Input batch size for training')
@@ -33,7 +36,7 @@ def main_worker():
     local_rank = int(os.environ["LOCAL_RANK"])
     global_rank = int(os.environ["RANK"])
     world_size = int(os.environ["WORLD_SIZE"])
-    device = torch.device(f"cuda:{local_rank}")  #note: we haven´t used get_device from device_utils here
+    device = torch.device(f"cuda:{local_rank}")  # Note: we don't use get_device from device_utils here
 
    # Log initialization info
     if global_rank == 0:
@@ -44,8 +47,7 @@ def main_worker():
     per_gpu_batch_size = args.batch_size // world_size  # Divide global batch size across GPUs
     train_sampler = DistributedSampler(
         torchvision.datasets.CIFAR100(
-            #note: replace this path with the one where you place your datasets folder.
-            root="/cluster/work/projects/<project_number>/binod/olivia/datasets/",
+            root=DATA_DIR,
             train=True,
             download=True
         )
@@ -66,7 +68,7 @@ def main_worker():
     optimizer = torch.optim.SGD(model.parameters(), lr=args.base_lr, momentum=0.9, weight_decay=5e-4)
 
     # Initialize gradient scaler for mixed precision
-    scaler = torch.cuda.amp.GradScaler()
+    scaler = torch.amp.GradScaler('cuda')
     val_accuracy = []
     total_time = 0
     total_images = 0  # Total images processed globally
@@ -85,7 +87,7 @@ def main_worker():
             optimizer.zero_grad()
 
            # Forward pass with mixed precision
-            with torch.cuda.amp.autocast():
+            with torch.amp.autocast('cuda'):
                 outputs = model(images)
                 loss = loss_fn(outputs, labels)
 

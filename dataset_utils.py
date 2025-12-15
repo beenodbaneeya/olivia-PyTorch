@@ -4,14 +4,11 @@ import torch
 from pathlib import Path
 import os
 
-
 def _data_dir_default():
     repo_root = Path(__file__).resolve().parent
     data_dir = repo_root / "datasets"
     data_dir.mkdir(parents=True, exist_ok=True)
     return data_dir
-
-
 
 
 def load_cifar100(batch_size, num_workers=0,sampler=None, data_dir=None):
